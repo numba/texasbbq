@@ -270,7 +270,6 @@ def switch_environment(target):
 
 def print_environment_details(target):
     execute("conda env export -n {}".format(target.name))
-    execute("numba -s")
 
 
 def find_all_targets(module):
