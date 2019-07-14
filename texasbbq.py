@@ -312,11 +312,9 @@ def find_all_targets(module):
         obj()
         for name, obj in inspect.getmembers(sys.modules[module])
         if inspect.isclass(obj)
-        and issubclass(obj, TestProject)
-        and obj is not TestProject
+        and issubclass(obj, GitTarget)
+        and obj is not GitTarget
     ]
-
-
 
 
 def parse_arguments(available_targets):
