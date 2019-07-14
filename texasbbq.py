@@ -132,7 +132,7 @@ def conda_install(env, name):
     execute("conda install -y -n {} {}".format(env, name))
 
 
-class IntegrationTestGitSource(object):
+class GitSource(object):
 
     @property
     def name(self):
@@ -160,7 +160,7 @@ class IntegrationTestGitSource(object):
         os.chdir('../')
 
 
-class IntegrationTestCondaSource(object):
+class CondaSource(object):
 
     @property
     def name(self):
@@ -174,7 +174,7 @@ class IntegrationTestCondaSource(object):
         conda_install(env, self.conda_package)
 
 
-class IntegrationTestProject(object):
+class TestProject(object):
     """ Subclass this to add metadata for a project. """
     @property
     def name(self):
@@ -318,8 +318,8 @@ def find_all_targets(module):
         obj()
         for name, obj in inspect.getmembers(sys.modules[module])
         if inspect.isclass(obj)
-        and issubclass(obj, IntegrationTestProject)
-        and obj is not IntegrationTestProject
+        and issubclass(obj, TestProject)
+        and obj is not TestProject
     ]
 
 
