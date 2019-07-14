@@ -160,6 +160,20 @@ class IntegrationTestGitSource(object):
         os.chdir('../')
 
 
+class IntegrationTestCondaSource(object):
+
+    @property
+    def name(self):
+        raise NotImplementedError
+
+    @property
+    def conda_package(self):
+        raise NotImplementedError
+
+    def install(self, env):
+        conda_install(env, self.conda_package)
+
+
 class IntegrationTestProject(object):
     """ Subclass this to add metadata for a project. """
     @property
