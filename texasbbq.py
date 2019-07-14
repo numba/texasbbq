@@ -151,13 +151,12 @@ class GitSource(object):
         raise NotImplementedError
 
     def install(self, env):
-        execute("git clone -b {} {} {}".format(self.git_ref,
-                                               self.clone_url,
-                                               self.name,
-                                               ))
-        os.chdir(self.name)
-        execute("conda run -n {} {}".format(env, self.install_command))
-        os.chdir('../')
+        if not os.path.exists(self.name):
+            execute("git clone -b {} {} {}".format(
+                self.git_ref, self.clone_url, self.name))
+            os.chdir(self.name)
+            execute("conda run -n {} {}".format(env, self.install_command))
+            os.chdir('../')
 
 
 class CondaSource(object):
