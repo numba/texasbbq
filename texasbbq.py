@@ -132,6 +132,34 @@ def conda_install(env, name):
     execute("conda install -y -n {} {}".format(env, name))
 
 
+class IntegrationTestGitSource(object):
+
+    @property
+    def name(self):
+        raise NotImplementedError
+
+    @property
+    def clone_url(self):
+        raise NotImplementedError
+
+    @property
+    def git_ref(self):
+        raise NotImplementedError
+
+    @property
+    def install_command(self):
+        raise NotImplementedError
+
+    def install(self, env):
+        execute("git clone -b {} {} {}".format(self.git_ref,
+                                               self.clone_url,
+                                               self.name,
+                                               ))
+        os.chdir(self.name)
+        execute("conda run -n {} {}".format(env, self.install_command))
+        os.chdir('../')
+
+
 class IntegrationTestProject(object):
     """ Subclass this to add metadata for a project. """
     @property
