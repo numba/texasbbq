@@ -25,14 +25,14 @@ MACOSX_X86_64 = "MacOSX-x86_64"
 
 STAGE_MINICONDA = "miniconda"
 STAGE_ENVIRONMENT = "environment"
-STAGE_CLONE = "clone"
-STAGE_INSTALL = "install"
+STAGE_INSTALL_SOURCE = "install_source"
+STAGE_INSTALL_TARGET = "install_target"
 STAGE_TESTS = "tests"
 ALL_STAGES = [
     STAGE_MINICONDA,
     STAGE_ENVIRONMENT,
-    STAGE_CLONE,
-    STAGE_INSTALL,
+    STAGE_INSTALL_SOURCE,
+    STAGE_INSTALL_TARGET,
     STAGE_TESTS,
 ]
 
@@ -319,10 +319,10 @@ def run(source, stages, available_targets, targets):
             os.chdir(basedir)
             if STAGE_ENVIRONMENT in stages:
                 setup_environment(source, target)
-            if STAGE_CLONE in stages:
-                setup_git(target)
+            if STAGE_INSTALL_SOURCE in stages:
+                source.install(target.name)
             switch_environment(target)
-            if STAGE_INSTALL in stages:
+            if STAGE_INSTALL_TARGET in stages:
                 target.install()
             print_environment_details(target)
             if STAGE_TESTS in stages:
