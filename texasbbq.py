@@ -298,10 +298,9 @@ def setup_git(target):
         os.chdir(target.name)
 
 
-def setup_environment(source, target):
+def setup_environment(target):
     if target.name not in conda_environments():
         conda_create_env(target.name)
-        source.install(target.name)
         for dep in target.conda_dependencies:
             conda_install(target.name, dep)
 
@@ -360,7 +359,7 @@ def run(source, stages, available_targets, targets):
         if name in targets:
             os.chdir(basedir)
             if STAGE_ENVIRONMENT in stages:
-                setup_environment(source, target)
+                setup_environment(target)
             if STAGE_INSTALL_SOURCE in stages:
                 source.install(target.name)
             switch_environment(target)
