@@ -174,7 +174,7 @@ class CondaSource(object):
         conda_install(env, self.conda_package)
 
 
-class TestProject(object):
+class GitTarget(object):
     """ Subclass this to add metadata for a project. """
     @property
     def name(self):
@@ -242,7 +242,7 @@ class TestProject(object):
         """
         raise NotImplementedError
 
-    def install(self):
+    def install_command(self):
         """ Execute command to install the project.
 
         Use this to execute the command or commands you need to install the
@@ -252,7 +252,7 @@ class TestProject(object):
         """
         raise NotImplementedError
 
-    def run_tests(self):
+    def test_command(self):
         """ Execute command to run tests.
 
         Use this to execute the command or commands you need to run the
@@ -262,23 +262,17 @@ class TestProject(object):
         """
         raise NotImplementedError
 
-    @property
-    def needs_clone(self):
-        try:
-            self.clone_url
-        except NotImplementedError:
-            return False
-        else:
-            return True
+    def install(self):
+        if not os.path.exists(self.name):
+            git_clone_ref(self.clone_url, self.git_ref, self.name)
+        os.chdir(self.name)
+        execute("conda run -n {} {}".format(self.name, self.install_command))
+        os.chdir('../')
 
-    @property
-    def needs_checkout(self):
-        try:
-            self.target_ref
-        except NotImplementedError:
-            return False
-        else:
-            return True
+    def test(self):
+        os.chdir(self.name)
+        execute("conda run -n {} {}".format(self.name, self.test_command))
+        os.chdir('../')
 
 
 def bootstrap_miniconda():
@@ -368,7 +362,7 @@ def run(source, stages, available_targets, targets):
             print_environment_details(target)
             if STAGE_TESTS in stages:
                 try:
-                    target.run_tests()
+                    target.test()
                 except subprocess.CalledProcessError:
                     failed.append(target.name)
     if STAGE_TESTS in stages:
