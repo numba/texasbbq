@@ -1,5 +1,154 @@
-********
 texasbbq
-********
+========
 
 Smoke out the bugs that break dependent projects.
+
+About
+-----
+
+A project that allows you to test a source against potentially multiple target
+projects, i.e. downstream projects that depend on it. This allows an early
+warning when developing the source, because a daily master of the source
+project can be checked against all significant downstream targets in an
+automated fashion. Such testing is especially useful for core libraries, such as
+the ones that power the rest of the SciPy ecosystem and helps to reduce the
+risk of breaking an ecosystem with a faulty release.
+
+Name
+----
+
+The techniques here have been extracted from the Numba projects original
+approach at: The name was coined during a lightning talk at SciPy 2019 in
+Austin Texas where one of the pun panelists suggested "if you are all about
+smoking out bugs, you better call it barbecue!" Puns about "marination" and
+"roasting" followed.
+
+Principles
+----------
+
+It is just an ancillary script, so let's keep it minimal.
+
+* Minimalism
+* Single script
+* Simple installation
+* Single page README
+* Minimal dependencies
+* Modular design
+* Idempotent behaviour
+* Simple license
+* Trivial to release
+
+Usage
+-----
+
+The script ``texasbbq.py``  Configuration
+happens (for now) in a Python script by subclassing one ``Source``
+configuration class and several ``Target`` subclasses. ``texasbbq`` then
+provides a command line interface for running the tests.
+
+The main entry point is a single script, ``texasbbq.py``, which is used to
+drive the integration testing. This script will run on at least Python 2.7 and
+3.7 and has zero third-party dependencies. Hence it will probably run on a
+large variety of different CI systems and platforms. It provides the main entry
+point and a pure Python interface to ``miniconda`` without using a shell
+language.
+
+The script will download and bootstrap a self-contained miniconda distribution
+to ensure a clean build.  You can also run it locally in case you need to debug
+a build or want to add a new project to test.
+
+It has multiple *stages*, which are actions to perform and multiple *targets*,
+which are projects to be tested.
+
+Sources
+-------
+
+Every integration-testing setup configuration must have at least one of
+``CondaSource`` or ``GitSource`` to define the source project to be tested. The
+difference between the two is that for a ``CondaSource`` you are configuring
+that the source be installed via a ``conda`` package. For example the build
+artifact result of a nightly or development build. For a ``GitSource`` project
+you are installing the project by cloning a copy from master and building it
+prior to testing.
+
+Here is an example ``CondaSource`` configuration from the Numba project::
+
+    from texasbbq import CondaSource
+
+    class NumbaSource(CondaSource):
+
+        module = __name__
+
+        @property
+        def name(self):
+            return "numba"
+
+        @property
+        def conda_package(self):
+            return "-c numba/label/dev numba"
+
+Targets
+-------
+
+Targets are projects that should be tested as part of the integration tests.
+They are specified as either a ``CondaTarget`` or a ``GitTarget``.
+
+In an ideal case, the project ships the tests and running the tests is simply a
+matter of installing the (potentially pre-compiled) conda package and running
+the tests. In such cases a ``CondaTarget`` will suffice.  In case this isn't
+possible, doing a ``git clone``, building the package from source and running
+the tests from the clone is also supported. In that case, you will need to use
+a ``GitTarget``.
+
+Here is the example ``GitTarget`` configuration for the UMAP project, when
+testing with Numba as a source::
+
+    class UmapTests(GitTarget):
+        @property
+        def name(self):
+            return "umap"
+
+        @property
+        def clone_url(self):
+            return "https://github.com/lmcinnes/umap"
+
+        @property
+        def git_ref(self):
+            return([t for t in git_ls_remote_tags(self.clone_url) if not
+                    t.startswith("v")][-1])
+
+        @property
+        def conda_dependencies(self):
+            return ["numpy scikit-learn scipy nose"]
+
+        @property
+        def install_command(self):
+            return "pip install -e ."
+
+        @property
+        def test_command(self):
+            return "nosetests -s umap"
+
+Lastly, ``texasbbq.py`` will automatically detect any such subclasses and
+make them available.
+
+Installation
+------------
+
+* via pip from pypi
+* via pip from github
+* with curl
+* locally with ln -s
+
+
+Continuous Integration Testing Examples
+---------------------------------------
+
+* https://github.com/numba/numba-integration-testing
+* https://github.com/dask/dask-integration-testing
+
+License
+-------
+
+texasbbq is Copyright (c) 2019, Anaconda, Inc. and provided under the terms of
+a 2-Clause BSD license.
