@@ -147,6 +147,10 @@ class GitSource(object):
         raise NotImplementedError
 
     @property
+    def conda_dependencies(self):
+        raise NotImplementedError
+
+    @property
     def install_command(self):
         raise NotImplementedError
 
@@ -154,6 +158,8 @@ class GitSource(object):
         if not os.path.exists(self.name):
             execute("git clone -b {} {} {}".format(
                 self.git_ref, self.clone_url, self.name))
+            for dep in self.conda_dependencies:
+                conda_install(env, dep)
             os.chdir(self.name)
             execute("conda run -n {} {}".format(env, self.install_command))
             os.chdir('../')
