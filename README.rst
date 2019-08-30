@@ -42,8 +42,8 @@ Usage
 
 Configuration happens (for now) in a Python script by subclassing one
 ``Source`` configuration class as well as several ``Target`` subclasses and
-placeing these in a configuration script, for example ``switchboard.py``. The
-module ``texasbbq`` will then provides a command line interface for running the
+placing these in a configuration script, for example ``switchboard.py``. The
+module ``texasbbq`` will then provides a command-line interface for running the
 tests (see blow).
 
 The main entry point is a single script, ``texasbbq.py``, which is used to
@@ -139,7 +139,7 @@ make them available.
 Command-Line Interface
 ----------------------
 
-In order to access the command-line interface, place the following snippet at
+In order to access the command-line interface, import the ``main`` function from ``texasbbq`` and place the following snippet at
 the end of your configuration script:
 
 .. code-block:: python
@@ -176,10 +176,10 @@ idempotent.  I.e. if miniconda has been downloaded and installed that step will
 not be done again.
 
 By default, all stages and all targets will be run. If you want to limit the
-stages use the ``-s`` or ``--stages`` switch. If you want to limit the targets
-use the ``-t`` or ``--targets`` switch.
+stages use the ``-s`` or ``--stages`` option. If you want to limit the targets
+use the ``-t`` or ``--targets`` option.
 
-Examples::
+Examples (assuming your initial configuration script was called ``switchboard.py``)::
 
     # Only download and install miniconda
     $ ./switchboard.py -s miniconda
