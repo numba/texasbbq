@@ -40,9 +40,11 @@ It is just an ancillary script, so let's keep it minimal.
 Usage
 -----
 
-Configuration happens (for now) in a Python script by subclassing one ``Source``
-configuration class and several ``Target`` subclasses. ``texasbbq`` then
-provides a command line interface for running the tests.
+Configuration happens (for now) in a Python script by subclassing one
+``Source`` configuration class as well as several ``Target`` subclasses and
+placing these in a configuration script, for example ``switchboard.py``. The
+module ``texasbbq`` will then provides a command-line interface for running the
+tests (see blow).
 
 The main entry point is a single script, ``texasbbq.py``, which is used to
 drive integration testing. This script will run on at least Python 2.7 and
@@ -134,6 +136,62 @@ testing with Numba as a source:
 Lastly, ``texasbbq.py`` will automatically detect any target subclasses and
 make them available.
 
+Command-Line Interface
+----------------------
+
+In order to access the command-line interface, import the ``main`` function from ``texasbbq`` and place the following snippet at
+the end of your configuration script:
+
+.. code-block:: python
+
+    if __name__ == "__main__":
+        main(NumbaSource())
+
+And replace ``NumbaSource`` with the appropriate ``Source`` for your project.
+
+Now, assuming your initial configuration script was called ``switchboard.py``,
+this will now be equipped to run one of multiple *stages* for one of multiple
+*targets*.
+
+The stages are as follows:
+
+miniconda
+  Download and setup miniconda distribution.
+
+environment
+  Setup conda environments for each of the targets.
+
+install_source
+  Install the source to the given environments.
+
+install_target
+  Install each target to the given environments.
+
+tests
+  Run tests for each target.
+
+
+The two stages: ``miniconda`` and ``environment`` are more or less
+idempotent.  I.e. if miniconda has been downloaded and installed that step will
+not be done again.
+
+By default, all stages and all targets will be run. If you want to limit the
+stages use the ``-s`` or ``--stages`` option. If you want to limit the targets
+use the ``-t`` or ``--targets`` option.
+
+Examples (assuming your initial configuration script was called ``switchboard.py``)::
+
+    # Only download and install miniconda
+    $ ./switchboard.py -s miniconda
+
+    # Only run tests for umap
+    $ ./switchboard.py -s tests -t umap
+
+    # Only download miniconda and setup environment for umap
+    $ ./switchboard.py -s miniconda environment -t umap
+
+Please see the output of ``./switchboard.py -h`` for more information.
+
 Installation
 ------------
 
@@ -154,6 +212,17 @@ Continuous Integration Testing Examples
 
 * https://github.com/numba/numba-integration-testing
 * https://github.com/jrbourbeau/dask-integration-testing
+
+Caveats
+=======
+
+* The script is reasonably robust but won't respond well to malformed user
+  input. For example, if you try to run only the ``test`` stage without the
+  others it is likely to fail.
+
+* If you are running this locally and you already have an anaconda or miniconda
+  distribution activated you may run into problems. In such cases it is best to
+  run this script from a vanilla (non-customized) shell.
 
 License
 -------
