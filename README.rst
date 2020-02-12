@@ -69,7 +69,7 @@ you are installing the project by cloning a copy of the project repository and
 building it prior to testing.
 
 Here is an example ``CondaSource`` configuration from the `Numba
-<http://numba.pydata.org/>`_ project:
+<https://numba.pydata.org/>`_ project:
 
 .. code-block:: python
 
