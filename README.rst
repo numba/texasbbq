@@ -70,7 +70,8 @@ artifact result of a nightly or development build. For a ``GitSource`` project
 you are installing the project by cloning a copy of the project repository and
 building it prior to testing.
 
-Here is an example ``CondaSource`` configuration from the `Numba <http://numba.pydata.org/>`_ project:
+Here is an example ``CondaSource`` configuration from the `Numba
+<https://numba.pydata.org/>`_ project:
 
 .. code-block:: python
 
@@ -87,6 +88,37 @@ Here is an example ``CondaSource`` configuration from the `Numba <http://numba.p
         @property
         def conda_package(self):
             return "-c numba/label/dev numba"
+
+And here is an example ``GitSource`` configuration from the `Dask
+<https://dask.org/>`_ project:
+
+.. code-block:: python
+
+    from texasbbq import GitSource
+
+    class DaskSource(GitSource):
+
+        module = __name__
+
+        @property
+        def name(self):
+            return "dask"
+
+        @property
+        def clone_url(self):
+            return "https://github.com/dask/dask"
+
+        @property
+        def git_ref(self):
+            return "master"
+
+        @property
+        def conda_dependencies(self):
+            return ["-c conda-forge toolz numpy fsspec"]
+
+        @property
+        def install_command(self):
+            return "pip install -e ."
 
 Targets
 -------
