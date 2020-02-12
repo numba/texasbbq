@@ -41,12 +41,12 @@ PREFIX = "::>>"
 
 
 def echo(value):
-    """ Print to stdout with prefix. """
+    """Print to stdout with prefix."""
     print("{} {}".format(PREFIX, value))
 
 
 def execute(command, capture=False):
-    """ Execute a command and potentially capture and return its output. """
+    """Execute a command and potentially capture and return its output."""
     echo("running: '{}'".format(command))
     if capture:
         return subprocess.check_output(shlex.split(command))
@@ -58,7 +58,7 @@ UNAME = execute("uname", capture=True).strip().decode("utf-8")
 
 
 def miniconda_url():
-    """ Get the correct miniconda download url. """
+    """Get the correct miniconda download url."""
     if UNAME == "Linux":
         filename = MINCONDA_FILE_TEMPLATE.format(LINUX_X86_64)
     elif UNAME == "Darwin":
@@ -69,17 +69,17 @@ def miniconda_url():
 
 
 def wget_conda(url, output):
-    """ Download miniconda.sh with wget. """
+    """Download miniconda.sh with wget."""
     execute("wget {} -O {}".format(url, output))
 
 
 def install_miniconda(install_path):
-    """ Bootstrap miniconda to a given path. """
+    """Bootstrap miniconda to a given path."""
     execute("bash miniconda.sh -b -p {}".format(install_path))
 
 
 def inject_conda_path():
-    """ Prefix the $PATH with the miniconda binary paths. """
+    """Prefix the $PATH with the miniconda binary paths."""
     os.environ["PATH"] = ":".join(
         [MINCONDA_BIN_PATH, MINCONDA_CONDABIN_PATH]
         + os.environ["PATH"].split(":")
@@ -87,7 +87,7 @@ def inject_conda_path():
 
 
 def switch_environment_path(env):
-    """ Prefix the $PATH with the environments bin path. """
+    """Prefix the $PATH with the environments bin path."""
     os.environ["PATH"] = ":".join(
         [os.path.join(conda_environments()[env], "bin")]
         + os.environ["PATH"].split(":")[1:]
@@ -95,39 +95,39 @@ def switch_environment_path(env):
 
 
 def git_clone(url):
-    """ Run 'git clone' with a given url.  """
+    """Run 'git clone' with a given url."""
     execute("git clone {}".format(url))
 
 
 def git_clone_ref(url, ref, directory):
-    """ Run 'git clone' with a given ref, url and directory. """
+    """Run 'git clone' with a given ref, url and directory."""
     execute("git clone -b {} {} --depth=1 {}".format(ref, url, directory))
 
 
 def git_tag():
-    """ Run git tag locally to get all tags. """
+    """Run git tag locally to get all tags."""
     return execute("git tag", capture=True).split('\n')
 
 
 def git_ls_remote_tags(url):
-    """ Run git ls-remote to obtain all tags available at remote url. """
+    """Run git ls-remote to obtain all tags available at remote url."""
     return [os.path.basename(line.split("\t")[1])
             for line in execute("git ls-remote --tags --refs {}".format(url),
             capture=True).decode("utf-8").split("\n") if line]
 
 
 def git_checkout(tag):
-    """ Run 'git checkout' on a given tag. """
+    """Run 'git checkout' on a given tag."""
     execute("git checkout {}".format(tag))
 
 
 def conda_update_conda():
-    """ Get miniconda to update itself. """
+    """Get miniconda to update itself."""
     execute("conda update -y -n base -c defaults conda")
 
 
 def conda_environments():
-    """ Return a dict of conda environments mapping name to path. """
+    """Return a dict of conda environments mapping name to path."""
     return dict(
         (
             (os.path.basename(i), i)
@@ -139,12 +139,12 @@ def conda_environments():
 
 
 def conda_create_env(name):
-    """ Create a conda environment with a given name. """
+    """Create a conda environment with a given name."""
     execute("conda create -y -n {}".format(name))
 
 
 def conda_install(env, name):
-    """ Use conda to install a package into an environment. """
+    """Use conda to install a package into an environment."""
     execute("conda install -y -n {} {}".format(env, name))
 
 
@@ -196,10 +196,10 @@ class CondaSource(object):
 
 
 class GitTarget(object):
-    """ Subclass this to add metadata for a project. """
+    """Subclass this to add metadata for a project."""
     @property
     def name(self):
-        """ Name of the project.
+        """Name of the project.
 
         This will be used as the directory to clone into as well as selecting
         the project from the command line.
@@ -214,7 +214,7 @@ class GitTarget(object):
 
     @property
     def clone_url(self):
-        """ Canonical clone url for the project.
+        """Canonical clone url for the project.
 
         This will be used to clone the project if needed. If you omit this, the
         project will not be cloned and it is assumed that the project ships
@@ -231,7 +231,7 @@ class GitTarget(object):
 
     @property
     def git_ref(self):
-        """ The target git ref to checkout.
+        """The target git ref to checkout.
 
         This function must work out which ref (branch or tag should be checked
         out and return that. A good start is to use
@@ -249,7 +249,7 @@ class GitTarget(object):
 
     @property
     def conda_dependencies(self):
-        """ Conda dependencies for this project.
+        """Conda dependencies for this project.
 
         The conda dependencies for this project. If you need to install things
         in a specific order with multiple, subsequent, `conda` calls, use
@@ -264,7 +264,7 @@ class GitTarget(object):
         raise NotImplementedError
 
     def install_command(self):
-        """ Execute command to install the project.
+        """Execute command to install the project.
 
         Use this to execute the command or commands you need to install the
         project. If you specified a `clone_url` you may assume that the
@@ -274,7 +274,7 @@ class GitTarget(object):
         raise NotImplementedError
 
     def test_command(self):
-        """ Execute command to run tests.
+        """Execute command to run tests.
 
         Use this to execute the command or commands you need to run the
         test-suite. If you specified a `clone_url` you may assume that the
