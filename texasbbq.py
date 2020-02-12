@@ -383,6 +383,7 @@ class GitTarget(object):
 
 
 def bootstrap_miniconda():
+    """Download, install and update miniconda."""
     url = miniconda_url()
     if not os.path.exists(MINCONDA_INSTALLER):
         wget_conda(url, MINCONDA_INSTALLER)
@@ -393,6 +394,7 @@ def bootstrap_miniconda():
 
 
 def setup_git(target):
+    """ TO BE REMOVED """
     if target.needs_clone:
         if not os.path.exists(target.name):
             git_clone_ref(target.clone_url, target.target_tag, target.name)
@@ -400,6 +402,7 @@ def setup_git(target):
 
 
 def setup_environment(target):
+    """Setup conda environment for target and install dependencies."""
     if target.name not in conda_environments():
         conda_create_env(target.name)
         for dep in target.conda_dependencies:
@@ -407,14 +410,17 @@ def setup_environment(target):
 
 
 def switch_environment(target):
+    """ TO BE REMOVED """
     switch_environment_path(target.name)
 
 
 def print_environment_details(target):
+    """Print details of the conda environment."""
     execute("conda env export -n {}".format(target.name))
 
 
 def find_all_targets(module):
+    """Inspect a module and discover all subclasses of GitTarget."""
     return [
         obj()
         for name, obj in inspect.getmembers(sys.modules[module])
@@ -425,6 +431,7 @@ def find_all_targets(module):
 
 
 def parse_arguments(available_targets):
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-s",
@@ -448,6 +455,20 @@ def parse_arguments(available_targets):
 
 
 def run(source, stages, available_targets, targets):
+    """Run the integration testing dance.
+
+    Parameters
+    ----------
+    source: GitSource or CondaSource
+        The source for the integration testing dance.
+    stages: list of str
+        The stages of the dance to execute.
+    available_targets: list or str
+        The list of targets available in the module
+    targets: list of str
+        The targets to actually test on.
+
+    """
     failed = []
     basedir = os.getcwd()
     if STAGE_MINICONDA in stages:
@@ -479,6 +500,13 @@ def run(source, stages, available_targets, targets):
 
 
 def main(source):
+    """Main entry point.
+
+    Parameters
+    ----------
+    source: GitSource or CondaSource
+        The source for the integration testing dance.
+    """
     available_targets = dict(
         (target.name, target) for target in find_all_targets(source.module)
     )
