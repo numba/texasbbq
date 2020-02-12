@@ -286,30 +286,27 @@ class CondaSource(object):
 
 
 class GitTarget(object):
-    """Subclass this to add metadata for a project."""
+    """Subclass this to configure a target."""
     @property
     def name(self):
-        """Name of the project.
+        """Name of the target.
 
         This will be used as the directory to clone into as well as selecting
-        the project from the command line.
+        the target from the command line.
 
         Returns
         -------
         name : str
-            The name of the project.
+            The name of the target.
 
         """
         raise NotImplementedError
 
     @property
     def clone_url(self):
-        """Canonical clone url for the project.
+        """Canonical clone url for the target.
 
-        This will be used to clone the project if needed. If you omit this, the
-        project will not be cloned and it is assumed that the project ships
-        with tests. The url will be handed of directly to 'git
-        clone' so it has to be compatible with that.
+        This will be used to clone the target.
 
         Returns
         -------
@@ -327,7 +324,6 @@ class GitTarget(object):
         out and return that. A good start is to use
         `git_ls_remote_tags(self.clone_url)` to obtain a list of tags from the
         remote. If you want to use `master` just return that. If you specify
-        `clone_url` you should also specify this.
 
         Returns
         -------
@@ -339,9 +335,9 @@ class GitTarget(object):
 
     @property
     def conda_dependencies(self):
-        """Conda dependencies for this project.
+        """Conda dependencies for this target.
 
-        The conda dependencies for this project. If you need to install things
+        The conda dependencies for this target. If you need to install things
         in a specific order with multiple, subsequent, `conda` calls, use
         multiple strings. You can include any channel information such as `-c
         numba` in the string.
@@ -354,11 +350,10 @@ class GitTarget(object):
         raise NotImplementedError
 
     def install_command(self):
-        """Execute command to install the project.
+        """Execute command to install the target.
 
         Use this to execute the command or commands you need to install the
-        project. If you specified a `clone_url` you may assume that the
-        commands will be executed inside the root directory of your clone.
+        target.
 
         """
         raise NotImplementedError
@@ -367,13 +362,13 @@ class GitTarget(object):
         """Execute command to run tests.
 
         Use this to execute the command or commands you need to run the
-        test-suite. If you specified a `clone_url` you may assume that the
-        commands will be executed inside the root directory of your clone.
+        test-suite. 
 
         """
         raise NotImplementedError
 
     def install(self):
+        """Install target into conda environment."""
         if not os.path.exists(self.name):
             git_clone_ref(self.clone_url, self.git_ref, self.name)
         os.chdir(self.name)
@@ -381,6 +376,7 @@ class GitTarget(object):
         os.chdir('../')
 
     def test(self):
+        """Run targets test command inside conda environment."""
         os.chdir(self.name)
         execute("conda run -n {} {}".format(self.name, self.test_command))
         os.chdir('../')
