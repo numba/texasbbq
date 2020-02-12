@@ -149,28 +149,94 @@ def conda_install(env, name):
 
 
 class GitSource(object):
+    """Subclass this to configure a source project from Git. """
 
     @property
     def name(self):
+        """Name of the source.
+
+        This will be used as the directory to clone into.
+
+        Returns
+        -------
+        name : str
+            The name of the project.
+
+        """
         raise NotImplementedError
 
     @property
     def clone_url(self):
+        """Canonical clone url for the source.
+
+        This will be used to clone the source.
+
+        Returns
+        -------
+        url : str
+            A 'git clone' compatible url.
+
+        """
         raise NotImplementedError
 
     @property
     def git_ref(self):
+        """The target git ref to checkout.
+
+        This function must work out which ref (branch or tag should be checked
+        out and return that. Since this is for a source, a branch such
+        as `master` is probably appropriate.
+
+        Returns
+        -------
+        ref : str
+            The git ref to checkout.
+
+        """
         raise NotImplementedError
 
     @property
     def conda_dependencies(self):
+        """Conda dependencies for this source.
+
+        The conda dependencies for this source. If you need to install things
+        in a specific order with multiple, subsequent, `conda` calls, use
+        multiple strings. You can include any channel information such as `-c
+        numba` in the string.
+
+        Returns
+        -------
+        dependencies : list of str
+            All conda dependencies.
+
+        """
         raise NotImplementedError
 
     @property
     def install_command(self):
+        """Execute command to install the source.
+
+        Use this to execute the command or commands you need to install the
+        source. You may assume that the commands will be executed inside the
+        root directory of your clone.
+
+        Returns
+        -------
+        command : str
+            The command to execute to install the source
+
+        """
         raise NotImplementedError
 
     def install(self, env):
+        """Install source into conda environment.
+
+        Parameters
+        ----------
+        env: str
+            The conda environment to install into
+
+        """
         if not os.path.exists(self.name):
             execute("git clone -b {} {} {}".format(
                 self.git_ref, self.clone_url, self.name))
@@ -185,13 +251,37 @@ class CondaSource(object):
 
     @property
     def name(self):
+        """Name of the source.
+
+        Returns
+        -------
+        name : str
+            The name of the source.
+
+        """
         raise NotImplementedError
 
     @property
     def conda_package(self):
+        """Name of the source conda package.
+
+        Returns
+        -------
+        conda_package : str
+            The name of the source conda package
+
+        """
         raise NotImplementedError
 
     def install(self, env):
+        """Install source into conda environment.
+
+        Parameters
+        ----------
+        env: str
+            The conda environment to install into
+
+        """
         conda_install(env, self.conda_package)
 
 
