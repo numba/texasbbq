@@ -326,7 +326,7 @@ class GitTarget(object):
         This function must work out which ref (branch or tag should be checked
         out and return that. A good start is to use
         `git_ls_remote_tags(self.clone_url)` to obtain a list of tags from the
-        remote. If you want to use `master` just return that. If you specify
+        remote. If you want to use `master` just return that.
 
         Returns
         -------
