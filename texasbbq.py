@@ -124,6 +124,9 @@ def git_checkout(tag):
 def conda_update_conda():
     """Get miniconda to update itself."""
     execute("conda update -y -n base -c defaults conda")
+    # FIXME: remove this when https://github.com/conda/conda/pull/9665 is
+    # merged and released
+    execute("conda install -y conda=4.7")
 
 
 def conda_environments():
@@ -367,10 +370,13 @@ class GitTarget(object):
         """
         raise NotImplementedError
 
+    def clone(self):
+        git_clone_ref(self.clone_url, self.git_ref, self.name)
+
     def install(self):
         """Install target into conda environment."""
         if not os.path.exists(self.name):
-            git_clone_ref(self.clone_url, self.git_ref, self.name)
+            self.clone()
         os.chdir(self.name)
         execute("conda run -n {} {}".format(self.name, self.install_command))
         os.chdir('../')
@@ -391,14 +397,6 @@ def bootstrap_miniconda():
         install_miniconda(MINCONDA_FULL_PATH)
     inject_conda_path()
     conda_update_conda()
-
-
-def setup_git(target):
-    """ TO BE REMOVED """
-    if target.needs_clone:
-        if not os.path.exists(target.name):
-            git_clone_ref(target.clone_url, target.target_tag, target.name)
-        os.chdir(target.name)
 
 
 def setup_environment(target):
