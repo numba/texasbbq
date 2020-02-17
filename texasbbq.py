@@ -41,10 +41,12 @@ PREFIX = "::>>"
 
 
 def echo(value):
+    """Print to stdout with prefix."""
     print("{} {}".format(PREFIX, value))
 
 
 def execute(command, capture=False):
+    """Execute a command and potentially capture and return its output."""
     echo("running: '{}'".format(command))
     if capture:
         return subprocess.check_output(shlex.split(command))
@@ -56,6 +58,7 @@ UNAME = execute("uname", capture=True).strip().decode("utf-8")
 
 
 def miniconda_url():
+    """Get the correct miniconda download url."""
     if UNAME == "Linux":
         filename = MINCONDA_FILE_TEMPLATE.format(LINUX_X86_64)
     elif UNAME == "Darwin":
@@ -66,14 +69,17 @@ def miniconda_url():
 
 
 def wget_conda(url, output):
+    """Download miniconda.sh with wget."""
     execute("wget {} -O {}".format(url, output))
 
 
 def install_miniconda(install_path):
+    """Bootstrap miniconda to a given path."""
     execute("bash miniconda.sh -b -p {}".format(install_path))
 
 
 def inject_conda_path():
+    """Prefix the $PATH with the miniconda binary paths."""
     os.environ["PATH"] = ":".join(
         [MINCONDA_BIN_PATH, MINCONDA_CONDABIN_PATH]
         + os.environ["PATH"].split(":")
@@ -81,6 +87,7 @@ def inject_conda_path():
 
 
 def switch_environment_path(env):
+    """Prefix the $PATH with the environments bin path."""
     os.environ["PATH"] = ":".join(
         [os.path.join(conda_environments()[env], "bin")]
         + os.environ["PATH"].split(":")[1:]
@@ -88,28 +95,34 @@ def switch_environment_path(env):
 
 
 def git_clone(url):
+    """Run 'git clone' with a given url."""
     execute("git clone {}".format(url))
 
 
 def git_clone_ref(url, ref, directory):
+    """Run 'git clone' with a given ref, url and directory."""
     execute("git clone -b {} {} --depth=1 {}".format(ref, url, directory))
 
 
 def git_tag():
+    """Run git tag locally to get all tags."""
     return execute("git tag", capture=True).split('\n')
 
 
 def git_ls_remote_tags(url):
+    """Run git ls-remote to obtain all tags available at remote url."""
     return [os.path.basename(line.split("\t")[1])
             for line in execute("git ls-remote --tags --refs {}".format(url),
             capture=True).decode("utf-8").split("\n") if line]
 
 
 def git_checkout(tag):
+    """Run 'git checkout' on a given tag."""
     execute("git checkout {}".format(tag))
 
 
 def conda_update_conda():
+    """Get miniconda to update itself."""
     execute("conda update -y -n base -c defaults conda")
     # FIXME: remove this when https://github.com/conda/conda/pull/9665 is
     # merged and released
@@ -117,6 +130,7 @@ def conda_update_conda():
 
 
 def conda_environments():
+    """Return a dict of conda environments mapping name to path."""
     return dict(
         (
             (os.path.basename(i), i)
@@ -128,36 +142,104 @@ def conda_environments():
 
 
 def conda_create_env(name):
+    """Create a conda environment with a given name."""
     execute("conda create -y -n {}".format(name))
 
 
 def conda_install(env, name):
+    """Use conda to install a package into an environment."""
     execute("conda install -y -n {} {}".format(env, name))
 
 
 class GitSource(object):
+    """Subclass this to configure a source project from Git. """
 
     @property
     def name(self):
+        """Name of the source.
+
+        This will be used as the directory to clone into.
+
+        Returns
+        -------
+        name : str
+            The name of the project.
+
+        """
         raise NotImplementedError
 
     @property
     def clone_url(self):
+        """Canonical clone url for the source.
+
+        This will be used to clone the source.
+
+        Returns
+        -------
+        url : str
+            A 'git clone' compatible url.
+
+        """
         raise NotImplementedError
 
     @property
     def git_ref(self):
+        """The target git ref to checkout.
+
+        This function must work out which ref (branch or tag should be checked
+        out and return that. Since this is for a source, a branch such
+        as `master` is probably appropriate.
+
+        Returns
+        -------
+        ref : str
+            The git ref to checkout.
+
+        """
         raise NotImplementedError
 
     @property
     def conda_dependencies(self):
+        """Conda dependencies for this source.
+
+        The conda dependencies for this source. If you need to install things
+        in a specific order with multiple, subsequent, `conda` calls, use
+        multiple strings. You can include any channel information such as `-c
+        numba` in the string.
+
+        Returns
+        -------
+        dependencies : list of str
+            All conda dependencies.
+
+        """
         raise NotImplementedError
 
     @property
     def install_command(self):
+        """Execute command to install the source.
+
+        Use this to execute the command or commands you need to install the
+        source. You may assume that the commands will be executed inside the
+        root directory of your clone.
+
+        Returns
+        -------
+        command : str
+            The command to execute to install the source
+
+        """
         raise NotImplementedError
 
     def install(self, env):
+        """Install source into conda environment.
+
+        Parameters
+        ----------
+        env: str
+            The conda environment to install into
+
+        """
         if not os.path.exists(self.name):
             execute("git clone -b {} {} {}".format(
                 self.git_ref, self.clone_url, self.name))
@@ -172,41 +254,62 @@ class CondaSource(object):
 
     @property
     def name(self):
-        raise NotImplementedError
-
-    @property
-    def conda_package(self):
-        raise NotImplementedError
-
-    def install(self, env):
-        conda_install(env, self.conda_package)
-
-
-class GitTarget(object):
-    """ Subclass this to add metadata for a project. """
-    @property
-    def name(self):
-        """ Name of the project.
-
-        This will be used as the directory to clone into as well as selecting
-        the project from the command line.
+        """Name of the source.
 
         Returns
         -------
         name : str
-            The name of the project.
+            The name of the source.
+
+        """
+        raise NotImplementedError
+
+    @property
+    def conda_package(self):
+        """Name of the source conda package.
+
+        Returns
+        -------
+        conda_package : str
+            The name of the source conda package
+
+        """
+        raise NotImplementedError
+
+    def install(self, env):
+        """Install source into conda environment.
+
+        Parameters
+        ----------
+        env: str
+            The conda environment to install into
+
+        """
+        conda_install(env, self.conda_package)
+
+
+class GitTarget(object):
+    """Subclass this to configure a target."""
+    @property
+    def name(self):
+        """Name of the target.
+
+        This will be used as the directory to clone into as well as selecting
+        the target from the command line.
+
+        Returns
+        -------
+        name : str
+            The name of the target.
 
         """
         raise NotImplementedError
 
     @property
     def clone_url(self):
-        """ Canonical clone url for the project.
+        """Canonical clone url for the target.
 
-        This will be used to clone the project if needed. If you omit this, the
-        project will not be cloned and it is assumed that the project ships
-        with tests. The url will be handed of directly to 'git
-        clone' so it has to be compatible with that.
+        This will be used to clone the target.
 
         Returns
         -------
@@ -218,13 +321,12 @@ class GitTarget(object):
 
     @property
     def git_ref(self):
-        """ The target git ref to checkout.
+        """The target git ref to checkout.
 
         This function must work out which ref (branch or tag should be checked
         out and return that. A good start is to use
         `git_ls_remote_tags(self.clone_url)` to obtain a list of tags from the
-        remote. If you want to use `master` just return that. If you specify
-        `clone_url` you should also specify this.
+        remote. If you want to use `master` just return that.
 
         Returns
         -------
@@ -236,9 +338,9 @@ class GitTarget(object):
 
     @property
     def conda_dependencies(self):
-        """ Conda dependencies for this project.
+        """Conda dependencies for this target.
 
-        The conda dependencies for this project. If you need to install things
+        The conda dependencies for this target. If you need to install things
         in a specific order with multiple, subsequent, `conda` calls, use
         multiple strings. You can include any channel information such as `-c
         numba` in the string.
@@ -251,21 +353,19 @@ class GitTarget(object):
         raise NotImplementedError
 
     def install_command(self):
-        """ Execute command to install the project.
+        """Execute command to install the target.
 
         Use this to execute the command or commands you need to install the
-        project. If you specified a `clone_url` you may assume that the
-        commands will be executed inside the root directory of your clone.
+        target.
 
         """
         raise NotImplementedError
 
     def test_command(self):
-        """ Execute command to run tests.
+        """Execute command to run tests.
 
         Use this to execute the command or commands you need to run the
-        test-suite. If you specified a `clone_url` you may assume that the
-        commands will be executed inside the root directory of your clone.
+        test-suite. 
 
         """
         raise NotImplementedError
@@ -274,6 +374,7 @@ class GitTarget(object):
         git_clone_ref(self.clone_url, self.git_ref, self.name)
 
     def install(self):
+        """Install target into conda environment."""
         if not os.path.exists(self.name):
             self.clone()
         os.chdir(self.name)
@@ -281,12 +382,14 @@ class GitTarget(object):
         os.chdir('../')
 
     def test(self):
+        """Run targets test command inside conda environment."""
         os.chdir(self.name)
         execute("conda run -n {} {}".format(self.name, self.test_command))
         os.chdir('../')
 
 
 def bootstrap_miniconda():
+    """Download, install and update miniconda."""
     url = miniconda_url()
     if not os.path.exists(MINCONDA_INSTALLER):
         wget_conda(url, MINCONDA_INSTALLER)
@@ -297,6 +400,7 @@ def bootstrap_miniconda():
 
 
 def setup_environment(target):
+    """Setup conda environment for target and install dependencies."""
     if target.name not in conda_environments():
         conda_create_env(target.name)
         for dep in target.conda_dependencies:
@@ -304,14 +408,17 @@ def setup_environment(target):
 
 
 def switch_environment(target):
+    """ TO BE REMOVED """
     switch_environment_path(target.name)
 
 
 def print_environment_details(target):
+    """Print details of the conda environment."""
     execute("conda env export -n {}".format(target.name))
 
 
 def find_all_targets(module):
+    """Inspect a module and discover all subclasses of GitTarget."""
     return [
         obj()
         for name, obj in inspect.getmembers(sys.modules[module])
@@ -322,6 +429,7 @@ def find_all_targets(module):
 
 
 def parse_arguments(available_targets):
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-s",
@@ -345,6 +453,20 @@ def parse_arguments(available_targets):
 
 
 def run(source, stages, available_targets, targets):
+    """Run the integration testing dance.
+
+    Parameters
+    ----------
+    source: GitSource or CondaSource
+        The source for the integration testing dance.
+    stages: list of str
+        The stages of the dance to execute.
+    available_targets: list or str
+        The list of targets available in the module
+    targets: list of str
+        The targets to actually test on.
+
+    """
     failed = []
     basedir = os.getcwd()
     if STAGE_MINICONDA in stages:
@@ -376,6 +498,13 @@ def run(source, stages, available_targets, targets):
 
 
 def main(source):
+    """Main entry point.
+
+    Parameters
+    ----------
+    source: GitSource or CondaSource
+        The source for the integration testing dance.
+    """
     available_targets = dict(
         (target.name, target) for target in find_all_targets(source.module)
     )
