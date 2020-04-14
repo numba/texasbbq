@@ -216,6 +216,25 @@ class GitSource(object):
         raise NotImplementedError
 
     @property
+    def conda_force_remove_packages(self):
+        """Conda packages to remove before installation.
+
+        Sometimes, the dependencies of as source will include the source itself
+        (and potentially other critical dependencies). This will mean, that a
+        released version of the source may be installed and this must be
+        removed before the source can be installed in the correct version. This
+        property should return a list of strings of all packages that must be
+        forcefully removed before installation proper of the source can
+        commence.
+
+        Returns
+        -------
+        packages : list of str
+            Packages to be removed.
+        """
+        raise NotImplementedError()
+
+    @property
     def install_command(self):
         """Execute command to install the source.
 
@@ -248,6 +267,18 @@ class GitSource(object):
             os.chdir(self.name)
             execute("conda run -n {} {}".format(env, self.install_command))
             os.chdir('../')
+
+    def conda_force_remove(self, env):
+        """Execute command to force remove any packages before installation.
+
+        Parameters
+        ----------
+        env: str
+            The conda environment to remove packages from.
+
+        """
+        for p in self.conda_force_remove_packages:
+            execute("conda remove -n {} -y --force {} ".format(env, p))
 
 
 class CondaSource(object):
@@ -365,7 +396,7 @@ class GitTarget(object):
         """Execute command to run tests.
 
         Use this to execute the command or commands you need to run the
-        test-suite. 
+        test-suite.
 
         """
         raise NotImplementedError
@@ -478,6 +509,10 @@ def run(source, stages, available_targets, targets):
             os.chdir(basedir)
             if STAGE_ENVIRONMENT in stages:
                 setup_environment(target)
+                try:
+                    source.conda_force_remove(target.name)
+                except NotImplementedError:
+                    pass
             if STAGE_INSTALL_SOURCE in stages:
                 source.install(target.name)
             switch_environment(target)
