@@ -85,13 +85,6 @@ def inject_conda_path():
         + os.environ["PATH"].split(":")
     )
 
-# untested, because pending removal
-def switch_environment_path(env):
-    """Prefix the $PATH with the environments bin path."""
-    os.environ["PATH"] = ":".join(
-        [os.path.join(conda_environments()[env], "bin")]
-        + os.environ["PATH"].split(":")[1:]
-    )
 
 # untested, because pending removal
 def git_clone(url):
@@ -482,7 +475,6 @@ def run(source, stages, available_targets, targets):
                 setup_environment(target)
             if STAGE_INSTALL_SOURCE in stages:
                 source.install(target.name)
-            switch_environment(target)
             if STAGE_INSTALL_TARGET in stages:
                 target.install()
             print_environment_details(target)
