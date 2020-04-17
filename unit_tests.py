@@ -30,7 +30,7 @@ class TestExecute(unittest.TestCase):
                 str(e)
             )
 
-    def test_execute_caputre(self):
+    def test_execute_capture(self):
         result = texasbbq.execute("echo -n 'test'", capture=True)
         self.assertEqual(b"test", result)
 
