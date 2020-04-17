@@ -75,12 +75,14 @@ class TestWGETConda(unittest.TestCase):
 
 class TestInjectCondaPath(unittest.TestCase):
 
+    @mock.patch("texasbbq.MINCONDA_BIN_PATH", "/test/miniconda3/bin")
+    @mock.patch("texasbbq.MINCONDA_CONDABIN_PATH", "/test/miniconda3/condabin")
     @mock.patch("os.environ", {"PATH": ""})
     def test_inject_conda_path(self):
         texasbbq.inject_conda_path()
         self.assertEqual(
-            "/Users/vhaenel/git/texasbbq/miniconda3/bin:"
-            "/Users/vhaenel/git/texasbbq/miniconda3/condabin:",
+            "/test/miniconda3/bin:"
+            "/test/miniconda3/condabin:",
             os.environ["PATH"]
         )
 
