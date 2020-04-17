@@ -1,0 +1,44 @@
+version: 2.1
+executors:
+  test-executor:
+    docker:
+      - image: circleci/python:3.6.1
+    working_directory: ~/repo
+
+commands:
+  run-target:
+    description: "run a specific target"
+    parameters:
+      target:
+        type: string
+        default: ""
+    steps:
+      - checkout
+      - run: sudo pip install --upgrade pip
+      - run:
+          command: python system_test.py -t << parameters.target >>
+          no_output_timeout: 42m
+
+jobs:
+  umap:
+    executor: test-executor
+    steps:
+      - run-target:
+          target: "umap"
+
+
+workflows:
+  version: 2.1
+  commit-test:
+    jobs:
+      - umap
+  nightly-test:
+    jobs:
+      - umap
+    triggers:
+      - schedule:
+          cron: "0 5 * * *"
+          filters:
+            branches:
+              only:
+                 - master
