@@ -85,7 +85,7 @@ def inject_conda_path():
         + os.environ["PATH"].split(":")
     )
 
-
+# untested, because pending removal
 def switch_environment_path(env):
     """Prefix the $PATH with the environments bin path."""
     os.environ["PATH"] = ":".join(
@@ -93,7 +93,7 @@ def switch_environment_path(env):
         + os.environ["PATH"].split(":")[1:]
     )
 
-
+# untested, because pending removal
 def git_clone(url):
     """Run 'git clone' with a given url."""
     execute("git clone {}".format(url))
@@ -104,6 +104,7 @@ def git_clone_ref(url, ref, directory):
     execute("git clone -b {} {} --depth=1 {}".format(ref, url, directory))
 
 
+# untested, because pending removal
 def git_tag():
     """Run git tag locally to get all tags."""
     return execute("git tag", capture=True).split('\n')
@@ -116,6 +117,7 @@ def git_ls_remote_tags(url):
             capture=True).decode("utf-8").split("\n") if line]
 
 
+# untested, because pending removal
 def git_checkout(tag):
     """Run 'git checkout' on a given tag."""
     execute("git checkout {}".format(tag))

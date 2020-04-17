@@ -15,6 +15,8 @@ commands:
     steps:
       - checkout
       - run: sudo pip install --upgrade pip
+      - run: sudo pip install pytest
+      - run: pytest unit_tests.py
       - run:
           command: python system_test.py -t << parameters.target >>
           no_output_timeout: 42m
