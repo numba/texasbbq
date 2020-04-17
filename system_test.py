@@ -3,7 +3,7 @@
 """ This is the system test for texasbbq.
 
 It tests that the latest released version of Numba with the latest released
-version of umap. If anything is red, it's probably due to a bug with texasbbq.
+version of umap. If anything fails, it's probably due to a bug in texasbbq.
 
 """
 
