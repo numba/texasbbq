@@ -52,7 +52,7 @@ class UmapTests(GitTarget):
 
     @property
     def test_command(self):
-        return "nosetests -s umap"
+        return "pytest"
 
 
 if __name__ == "__main__":
