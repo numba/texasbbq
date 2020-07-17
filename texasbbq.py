@@ -437,6 +437,7 @@ def switch_environment(target):
 def print_environment_details(target):
     """Print details of the conda environment."""
     execute("conda env export -n {}".format(target.name))
+    execute("conda list -n {}".format(target.name))
 
 
 def find_all_targets(module):
