@@ -107,6 +107,24 @@ class TestGit(unittest.TestCase):
             "git ls-remote --tags --refs test_url", capture=True)
 
 
+class TestGitLatestTag(unittest.TestCase):
+
+    @mock.patch("texasbbq.git_ls_remote_tags")
+    def test_git_latest_tag(self, mock_ls_remote_tags):
+        mock_ls_remote_tags.return_value = (
+            ["v.1.0", "0.10.0", "v0.11.0"]
+        )
+        result = texasbbq.git_latest_tag("MOCK_URL", vprefix=False)
+        self.assertEqual("0.11.0", result)
+        result = texasbbq.git_latest_tag("MOCK_URL", vprefix=True)
+        self.assertEqual("v0.11.0", result)
+
+        result = texasbbq.git_latest_tag(
+            "MOCK_URL", vprefix=False,
+            exclude_filter=lambda x: x == "v0.11.0")
+        self.assertEqual("0.10.0", result)
+
+
 class TestConda(unittest.TestCase):
 
     @mock.patch("texasbbq.execute")

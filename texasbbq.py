@@ -10,6 +10,8 @@ import subprocess
 import sys
 import json
 
+from packaging.version import parse
+
 
 MINICONDA_BASE_URL = "https://repo.continuum.io/miniconda/"
 MINCONDA_FILE_TEMPLATE = "Miniconda3-latest-{}.sh"
@@ -108,6 +110,31 @@ def git_ls_remote_tags(url):
     return [os.path.basename(line.split("\t")[1])
             for line in execute("git ls-remote --tags --refs {}".format(url),
             capture=True).decode("utf-8").split("\n") if line]
+
+
+def git_latest_tag(url, vprefix=True, exclude_filter=lambda x: False):
+    """ Get the latest tag from a git repository.
+
+    This uses packaging.version.parse to sort the tags at the given url and
+    returns the largest one.
+
+    Parameters
+    ----------
+    url: str
+        The url of the git reproitory to use
+    vprefix: bool
+        Prefix the return value with the letter 'v'
+    exclude_filter: single argument callable
+        A filter to exclude certain tags from the git repo
+
+    Returns
+    -------
+    str: the latest tag from the git repo
+    """
+
+    latest = str(sorted([parse(t) for t in git_ls_remote_tags(url)
+                         if not exclude_filter(t)])[-1])
+    return "v" + latest if vprefix else latest
 
 
 # untested, because pending removal

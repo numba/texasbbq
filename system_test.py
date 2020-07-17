@@ -8,7 +8,7 @@ version of umap. If anything fails, it's probably due to a bug in texasbbq.
 """
 
 from texasbbq import (main,
-                      git_ls_remote_tags,
+                      git_latest_tag,
                       CondaSource,
                       GitTarget,
                       )
@@ -38,8 +38,9 @@ class UmapTests(GitTarget):
 
     @property
     def git_ref(self):
-        return([t for t in git_ls_remote_tags(self.clone_url) if not
-                t.startswith("v")][-1])
+        return git_latest_tag(self.clone_url,
+                              vprefix=False,
+                              exclude_filter=lambda x: x.startswith("v"))
 
     @property
     def conda_dependencies(self):
