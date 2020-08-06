@@ -148,7 +148,7 @@ def conda_update_conda():
     execute("conda update -y -n base -c defaults conda")
     # FIXME: remove this when https://github.com/conda/conda/pull/9665 is
     # merged and released
-    execute("conda install -y conda=4.7")
+    execute("conda install -y conda=4.7 python=3.7")
 
 
 def conda_environments():
