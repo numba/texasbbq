@@ -132,7 +132,7 @@ class TestConda(unittest.TestCase):
         texasbbq.conda_update_conda()
         mock_execute.assert_has_calls(
             [mock.call("conda update -y -n base -c defaults conda"),
-             mock.call("conda install -y conda=4.7")])
+             mock.call("conda install -y conda=4.7 python=3.7")])
 
     @mock.patch("texasbbq.execute")
     def test_conda_environments(self, mock_execute):
