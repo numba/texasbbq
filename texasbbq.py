@@ -146,9 +146,6 @@ def git_checkout(tag):
 def conda_update_conda():
     """Get miniconda to update itself."""
     execute("conda update -y -n base -c defaults conda")
-    # FIXME: remove this when https://github.com/conda/conda/pull/9665 is
-    # merged and released
-    execute("conda install -y conda=4.7")
 
 
 def conda_environments():
