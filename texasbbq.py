@@ -51,9 +51,9 @@ def execute(command, capture=False):
     """Execute a command and potentially capture and return its output."""
     echo("running: '{}'".format(command))
     if capture:
-        return subprocess.check_output(shlex.split(command))
+        return subprocess.check_output(command, shell=True)
     else:
-        subprocess.check_call(shlex.split(command))
+        subprocess.check_call(command, shell=True)
 
 
 UNAME = execute("uname", capture=True).strip().decode("utf-8")
@@ -437,6 +437,11 @@ def print_environment_details(target):
     execute("conda list -n {}".format(target.name))
 
 
+def print_package_details(source_name, target_name):
+    execute("conda list -n {} | grep -e {} -e {}"
+            .format(target_name, source_name, target_name))
+
+
 def find_all_targets(module):
     """Inspect a module and discover all subclasses of GitTarget."""
     return [
@@ -508,6 +513,7 @@ def run(source, stages, available_targets, targets):
                     target.test()
                 except subprocess.CalledProcessError:
                     failed.append(target.name)
+        print_package_details(source.name, target.name)
     if STAGE_TESTS in stages:
         if failed:
             echo("The following tests failed: '{}'".format(failed))
