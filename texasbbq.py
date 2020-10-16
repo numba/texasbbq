@@ -51,9 +51,9 @@ def execute(command, capture=False):
     """Execute a command and potentially capture and return its output."""
     echo("running: '{}'".format(command))
     if capture:
-        return subprocess.check_output(command, shell=True)
+        return subprocess.check_output(shlex.split(command))
     else:
-        subprocess.check_call(command, shell=True)
+        subprocess.check_call(shlex.split(command))
 
 
 UNAME = execute("uname", capture=True).strip().decode("utf-8")
@@ -438,7 +438,7 @@ def print_environment_details(target):
 
 
 def print_package_details(source_name, target_name):
-    execute("conda list -n {} | grep -e {} -e {}"
+    execute("conda list -n {} '(.*{}.*)|(.*{}.*)'"
             .format(target_name, source_name, target_name))
 
 
