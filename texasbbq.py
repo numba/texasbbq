@@ -437,6 +437,16 @@ def print_environment_details(target):
     execute("conda list -n {}".format(target.name))
 
 
+def print_package_details(source_name, target_name):
+    lines = execute("conda list -n {}".format(target_name),
+                    capture=True).decode("utf-8").split("\n")
+    for l in lines[:3]:
+        print(l)
+    for l in lines[3:]:
+        if source_name in l or target_name in l:
+            print(l)
+
+
 def find_all_targets(module):
     """Inspect a module and discover all subclasses of GitTarget."""
     return [
@@ -508,6 +518,7 @@ def run(source, stages, available_targets, targets):
                     target.test()
                 except subprocess.CalledProcessError:
                     failed.append(target.name)
+        print_package_details(source.name, target.name)
     if STAGE_TESTS in stages:
         if failed:
             echo("The following tests failed: '{}'".format(failed))
