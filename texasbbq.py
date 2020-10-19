@@ -438,8 +438,8 @@ def print_environment_details(target):
 
 
 def print_package_details(source_name, target_name):
-    lines= execute("conda list -n {}".format(target_name),
-                   capture=True).decode("utf-8").split("\n")
+    lines = execute("conda list -n {}".format(target_name),
+                    capture=True).decode("utf-8").split("\n")
     for l in lines[:3]:
         print(l)
     for l in lines[3:]:
