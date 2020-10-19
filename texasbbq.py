@@ -518,7 +518,7 @@ def run(source, stages, available_targets, targets):
                     target.test()
                 except subprocess.CalledProcessError:
                     failed.append(target.name)
-        print_package_details(source.name, target.name)
+            print_package_details(source.name, target.name)
     if STAGE_TESTS in stages:
         if failed:
             echo("The following tests failed: '{}'".format(failed))
