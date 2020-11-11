@@ -265,7 +265,7 @@ class GitSource(object):
             for dep in self.conda_dependencies:
                 conda_install(env, dep)
             os.chdir(self.name)
-            execute("conda run -n {} {}".format(env, self.install_command))
+            execute("conda run --no-capture-output -n {} {}".format(env, self.install_command))
             os.chdir('../')
 
 
@@ -397,13 +397,13 @@ class GitTarget(object):
         if not os.path.exists(self.name):
             self.clone()
         os.chdir(self.name)
-        execute("conda run -n {} {}".format(self.name, self.install_command))
+        execute("conda run --no-capture-output -n {} {}".format(self.name, self.install_command))
         os.chdir('../')
 
     def test(self):
         """Run targets test command inside conda environment."""
         os.chdir(self.name)
-        execute("conda run -n {} {}".format(self.name, self.test_command))
+        execute("conda run --no-capture-output -n {} {}".format(self.name, self.test_command))
         os.chdir('../')
 
 
