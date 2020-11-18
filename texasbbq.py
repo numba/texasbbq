@@ -407,7 +407,7 @@ class GitTarget(object):
         os.chdir('../')
 
 
-class CondaTarget(object)
+class CondaTarget(object):
     """Subclass this to configure a target which is installed from git."""
 
     @property
@@ -434,6 +434,22 @@ class CondaTarget(object)
         conda_package : str
             The name of the source conda package
 
+        """
+        raise NotImplementedError
+
+    @property
+    def conda_dependencies(self):
+        """Conda dependencies for this target.
+
+        The conda dependencies for this target. If you need to install things
+        in a specific order with multiple, subsequent, `conda` calls, use
+        multiple strings. You can include any channel information such as `-c
+        numba` in the string.
+
+        Returns
+        -------
+        dependencies : list of str
+            All conda dependencies.
         """
         raise NotImplementedError
 
