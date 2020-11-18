@@ -514,13 +514,14 @@ def print_package_details(source_name, target_name):
 
 
 def find_all_targets(module):
-    """Inspect a module and discover all subclasses of GitTarget."""
+    """Inspect a module and discover all subclasses of GitTarget and
+    CondaTarget. """
     return [
         obj()
         for name, obj in inspect.getmembers(sys.modules[module])
         if inspect.isclass(obj)
-        and issubclass(obj, GitTarget)
-        and obj is not GitTarget
+        and (issubclass(obj, GitTarget) or issubclass(obj, CondaTarget))
+        and (obj is not GitTarget and obj is not CondaTarget)
     ]
 
 
