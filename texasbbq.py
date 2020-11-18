@@ -468,9 +468,7 @@ class CondaTarget(object):
 
     def test(self):
         """Run targets test command inside conda environment."""
-        os.chdir(self.name)
         execute("conda run -n {} {}".format(self.name, self.test_command))
-        os.chdir('../')
 
 
 def bootstrap_miniconda():
