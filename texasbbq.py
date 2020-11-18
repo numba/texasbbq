@@ -308,7 +308,7 @@ class CondaSource(object):
 
 
 class GitTarget(object):
-    """Subclass this to configure a target."""
+    """Subclass this to configure a target which is installed from git."""
     @property
     def name(self):
         """Name of the target.
@@ -384,7 +384,7 @@ class GitTarget(object):
         """Execute command to run tests.
 
         Use this to execute the command or commands you need to run the
-        test-suite. 
+        test-suite.
 
         """
         raise NotImplementedError
@@ -399,6 +399,56 @@ class GitTarget(object):
         os.chdir(self.name)
         execute("conda run -n {} {}".format(self.name, self.install_command))
         os.chdir('../')
+
+    def test(self):
+        """Run targets test command inside conda environment."""
+        os.chdir(self.name)
+        execute("conda run -n {} {}".format(self.name, self.test_command))
+        os.chdir('../')
+
+
+class CondaTarget(object)
+    """Subclass this to configure a target which is installed from git."""
+
+    @property
+    def name(self):
+        """Name of the target.
+
+        This will be used for the name of the conda envoironment to test in
+        and as target from the command line.
+
+        Returns
+        -------
+        name : str
+            The name of the target.
+
+        """
+        raise NotImplementedError
+
+    @property
+    def conda_package(self):
+        """Name of the source conda package.
+
+        Returns
+        -------
+        conda_package : str
+            The name of the source conda package
+
+        """
+        raise NotImplementedError
+
+    def test_command(self):
+        """Execute command to run tests.
+
+        Use this to execute the command or commands you need to run the
+        test-suite.
+
+        """
+        raise NotImplementedError
+
+    def install(self):
+        """Install target into conda environment.  """
+        conda_install(self.name, self.conda_package)
 
     def test(self):
         """Run targets test command inside conda environment."""
