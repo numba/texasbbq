@@ -408,7 +408,7 @@ class GitTarget(object):
 
 
 class CondaTarget(object):
-    """Subclass this to configure a target which is installed from git."""
+    """Subclass this to configure a target which is installed via conda."""
 
     @property
     def name(self):
@@ -458,6 +458,11 @@ class CondaTarget(object):
 
         Use this to execute the command or commands you need to run the
         test-suite.
+
+        Returns
+        -------
+        command : str
+            The command to execute to run the test suite.
 
         """
         raise NotImplementedError
