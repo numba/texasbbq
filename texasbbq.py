@@ -308,7 +308,7 @@ class CondaSource(object):
 
 
 class GitTarget(object):
-    """Subclass this to configure a target."""
+    """Subclass this to configure a target which is installed from git."""
     @property
     def name(self):
         """Name of the target.
@@ -384,7 +384,7 @@ class GitTarget(object):
         """Execute command to run tests.
 
         Use this to execute the command or commands you need to run the
-        test-suite. 
+        test-suite.
 
         """
         raise NotImplementedError
@@ -405,6 +405,75 @@ class GitTarget(object):
         os.chdir(self.name)
         execute("conda run -n {} {}".format(self.name, self.test_command))
         os.chdir('../')
+
+
+class CondaTarget(object):
+    """Subclass this to configure a target which is installed via conda."""
+
+    @property
+    def name(self):
+        """Name of the target.
+
+        This will be used for the name of the conda envoironment to test in
+        and as target from the command line.
+
+        Returns
+        -------
+        name : str
+            The name of the target.
+
+        """
+        raise NotImplementedError
+
+    @property
+    def conda_package(self):
+        """Name of the source conda package.
+
+        Returns
+        -------
+        conda_package : str
+            The name of the source conda package
+
+        """
+        raise NotImplementedError
+
+    @property
+    def conda_dependencies(self):
+        """Conda dependencies for this target.
+
+        The conda dependencies for this target. If you need to install things
+        in a specific order with multiple, subsequent, `conda` calls, use
+        multiple strings. You can include any channel information such as `-c
+        numba` in the string.
+
+        Returns
+        -------
+        dependencies : list of str
+            All conda dependencies.
+        """
+        raise NotImplementedError
+
+    def test_command(self):
+        """Execute command to run tests.
+
+        Use this to execute the command or commands you need to run the
+        test-suite.
+
+        Returns
+        -------
+        command : str
+            The command to execute to run the test suite.
+
+        """
+        raise NotImplementedError
+
+    def install(self):
+        """Install target into conda environment.  """
+        conda_install(self.name, self.conda_package)
+
+    def test(self):
+        """Run targets test command inside conda environment."""
+        execute("conda run -n {} {}".format(self.name, self.test_command))
 
 
 def bootstrap_miniconda():
@@ -448,13 +517,14 @@ def print_package_details(source_name, target_name):
 
 
 def find_all_targets(module):
-    """Inspect a module and discover all subclasses of GitTarget."""
+    """Inspect a module and discover all subclasses of GitTarget and
+    CondaTarget. """
     return [
         obj()
         for name, obj in inspect.getmembers(sys.modules[module])
         if inspect.isclass(obj)
-        and issubclass(obj, GitTarget)
-        and obj is not GitTarget
+        and (issubclass(obj, GitTarget) or issubclass(obj, CondaTarget))
+        and (obj is not GitTarget and obj is not CondaTarget)
     ]
 
 
