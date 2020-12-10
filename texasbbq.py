@@ -473,7 +473,7 @@ class CondaTarget(object):
 
     def test(self):
         """Run targets test command inside conda environment."""
-        execute("conda run -n {} {}".format(self.name, self.test_command))
+        execute("conda run --no-capture-output -n {} {}".format(self.name, self.test_command))
 
 
 def bootstrap_miniconda():
