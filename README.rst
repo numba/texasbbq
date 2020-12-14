@@ -51,11 +51,8 @@ drive integration testing. This script will run on at least Python 2.7 and 3.7
 and has only a single third-party python dependency: `packaging`. Hence it will
 probably run on a large variety of different CI systems and platforms. It
 provides a pure Python interface to ``conda`` without using a shell language.
-It will need at least `conda` 4.9 to operate.
-
-The script will download and bootstrap a self-contained miniconda distribution
-to ensure a clean build.  You can also run it locally in case you need to debug
-a build or want to add a new project to test.
+A self-contained miniconda distribution containing at least ``conda`` 4.9 will
+be dowwnloaded to ensure a clean build.
 
 It has multiple *stages*, which are actions to perform and multiple *targets*,
 which are projects to be tested.
