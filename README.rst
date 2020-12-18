@@ -52,7 +52,7 @@ and has only a single third-party python dependency: `packaging`. Hence it will
 probably run on a large variety of different CI systems and platforms. It
 provides a pure Python interface to ``conda`` without using a shell language.
 A self-contained miniconda distribution containing at least ``conda`` 4.9 will
-be dowwnloaded to ensure a clean build.
+be downloaded to ensure a clean build.
 
 It has multiple *stages*, which are actions to perform and multiple *targets*,
 which are projects to be tested.
