@@ -47,17 +47,24 @@ module ``texasbbq`` will then provides a command-line interface for running the
 tests (see blow).
 
 The main entry point is a single script, ``texasbbq.py``, which is used to
-drive integration testing. This script will run on at least Python 2.7 and
-3.7 and has zero third-party dependencies. Hence it will probably run on a
-large variety of different CI systems and platforms. It provides a pure Python
-interface to ``miniconda`` without using a shell language.
-
-The script will download and bootstrap a self-contained miniconda distribution
-to ensure a clean build.  You can also run it locally in case you need to debug
-a build or want to add a new project to test.
+drive integration testing. This script will run on at least Python 2.7 and 3.7
+and has only a single third-party python dependency: `packaging`. Hence it will
+probably run on a large variety of different CI systems and platforms. It
+provides a pure Python interface to ``conda`` without using a shell language.
+A self-contained miniconda distribution containing at least ``conda`` 4.9 will
+be downloaded to ensure a clean build.
 
 It has multiple *stages*, which are actions to perform and multiple *targets*,
 which are projects to be tested.
+
+Dependencies
+------------
+
+* Executable
+  * `git`
+  * `conda` (4.9) (Will be downloaded during operation, see above.)
+* Python packages
+  * `packaging`
 
 Sources
 -------
