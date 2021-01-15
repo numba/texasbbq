@@ -45,7 +45,7 @@ class UmapTests(GitTarget):
     @property
     def conda_dependencies(self):
         return ["numpy pytest nose scikit-learn pynndescent scipy pandas bokeh "
-                "matplotlib datashader holoviews tensorflow"]
+                "matplotlib datashader holoviews tensorflow scikit-image"]
 
     @property
     def install_command(self):
