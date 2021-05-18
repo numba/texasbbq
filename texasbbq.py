@@ -169,7 +169,7 @@ def conda_install(env, name):
     """Use conda to install a package into an environment."""
     execute("conda install -y -n {} {}".format(env, name))
 
-
+    
 class GitSource(object):
     """Subclass this to configure a source project from Git. """
 
@@ -370,6 +370,23 @@ class GitTarget(object):
             All conda dependencies.
         """
         raise NotImplementedError
+        
+    @property
+    def pip_dependencies(self):
+        """Pip dependencies for this target.
+        
+        The pip dependencies for this target. If you need to install things
+        in a specific order with multiple, subsequent, 'pip' calls, use
+        multiple strings. You can include any channel information such as '-c
+        numba' in the string. IF there are no pip dependencies return an empty 
+        string.
+        
+        Returns
+        -------
+        dependencies : list of str
+            All pip dependencies
+        """
+        raise NotImplementedError
 
     def install_command(self):
         """Execute command to install the target.
@@ -398,6 +415,8 @@ class GitTarget(object):
             self.clone()
         os.chdir(self.name)
         execute("conda run --no-capture-output -n {} {}".format(self.name, self.install_command))
+        if (self.pip_dependencies != ""):
+            execute("conda run --no-capture-output -n {} pip install {}".format(self.name, self.pip_dependencies)
         os.chdir('../')
 
     def test(self):
