@@ -378,7 +378,7 @@ class GitTarget(object):
         The pip dependencies for this target. If you need to install things
         in a specific order with multiple, subsequent, 'pip' calls, use
         multiple strings. You can include any channel information such as '-c
-        numba' in the string. IF there are no pip dependencies return an empty 
+        numba' in the string. If there are no pip dependencies return an empty 
         list.
         
         Returns
