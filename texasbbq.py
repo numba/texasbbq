@@ -169,7 +169,7 @@ def conda_install(env, name):
     """Use conda to install a package into an environment."""
     execute("conda install -y -n {} {}".format(env, name))
 
-    
+
 class GitSource(object):
     """Subclass this to configure a source project from Git. """
 
