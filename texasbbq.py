@@ -379,7 +379,7 @@ class GitTarget(object):
         in a specific order with multiple, subsequent, 'pip' calls, use
         multiple strings. You can include any channel information such as '-c
         numba' in the string. IF there are no pip dependencies return an empty 
-        string.
+        list.
         
         Returns
         -------
@@ -415,8 +415,9 @@ class GitTarget(object):
             self.clone()
         os.chdir(self.name)
         execute("conda run --no-capture-output -n {} {}".format(self.name, self.install_command))
-        if (self.pip_dependencies != ""):
-            execute("conda run --no-capture-output -n {} pip install {}".format(self.name, self.pip_dependencies)
+        if (self.pip_dependencies != []):
+            for dep in self.pip_dependencies:
+                execute("conda run --no-capture-output -n {} pip install {}".format(self.name, dep)
         os.chdir('../')
 
     def test(self):
