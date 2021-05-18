@@ -386,7 +386,7 @@ class GitTarget(object):
         dependencies : list of str
             All pip dependencies
         """
-        raise NotImplementedError
+        return []
 
     def install_command(self):
         """Execute command to install the target.
