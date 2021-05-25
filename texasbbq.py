@@ -417,7 +417,7 @@ class GitTarget(object):
         execute("conda run --no-capture-output -n {} {}".format(self.name, self.install_command))
         if (self.pip_dependencies != []):
             for dep in self.pip_dependencies:
-                execute("conda run --no-capture-output -n {} pip install {}".format(self.name, dep)
+                execute("conda run --no-capture-output -n {} pip install {}".format(self.name, dep))
         os.chdir('../')
 
     def test(self):
