@@ -61,9 +61,12 @@ Dependencies
 ------------
 
 * Executable
+
   * `git`
   * `conda` (4.9) (Will be downloaded during operation, see above.)
+
 * Python packages
+
   * `packaging`
 
 Sources
