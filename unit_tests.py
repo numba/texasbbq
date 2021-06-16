@@ -162,3 +162,11 @@ class TestConda(unittest.TestCase):
         texasbbq.conda_install("test_env", "test_package")
         mock_execute.assert_called_once_with(
             "conda install -y -n test_env test_package")
+
+class TestPip(unittest.TestCase):
+    
+    @mock.patch("texasbbq.execute")
+    def test_pip_install(self, mock_execute):
+        texasbbq.pip_install("test_env", ["dokuwiki", "dot2tex sphinxcontrib-tikz"])
+        mock_execute.assert_called_once_with(
+            "conda run --no-capture-output -n test_env pip install ['dokuwiki', 'dot2tex sphinxcontrib-tikz']")

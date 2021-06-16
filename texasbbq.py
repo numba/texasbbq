@@ -169,6 +169,10 @@ def conda_install(env, name):
     """Use conda to install a package into an environment."""
     execute("conda install -y -n {} {}".format(env, name))
 
+def pip_install(env, name):
+    """Use pip to install a package into an environment."""
+    execute("conda run --no-capture-output -n {} pip install {}".format(env, name))
+    
 
 class GitSource(object):
     """Subclass this to configure a source project from Git. """
@@ -370,6 +374,23 @@ class GitTarget(object):
             All conda dependencies.
         """
         raise NotImplementedError
+        
+    @property
+    def pip_dependencies(self):
+        """Pip dependencies for this target.
+        
+        The pip dependencies for this target. If you need to install things
+        in a specific order with multiple, subsequent, 'pip' calls, use
+        multiple strings. You can include any channel information such as '-c
+        numba' in the string. If there are no pip dependencies, return an empty 
+        list.
+        
+        Returns
+        -------
+        dependencies : list of str
+            All pip dependencies
+        """
+        return []
 
     def install_command(self):
         """Execute command to install the target.
@@ -452,7 +473,24 @@ class CondaTarget(object):
             All conda dependencies.
         """
         raise NotImplementedError
-
+    
+    @property
+    def pip_dependencies(self):
+        """Pip dependencies for this target.
+        
+        The pip dependencies for this target. If you need to install things
+        in a specific order with multiple, subsequent, 'pip' calls, use
+        multiple strings. You can include any channel information such as '-c
+        numba' in the string. If there are no pip dependencies, return an empty 
+        list.
+        
+        Returns
+        -------
+        dependencies : list of str
+            All pip dependencies
+        """
+        return []
+    
     def test_command(self):
         """Execute command to run tests.
 
@@ -493,6 +531,8 @@ def setup_environment(target):
         conda_create_env(target.name)
         for dep in target.conda_dependencies:
             conda_install(target.name, dep)
+        for dep in target.pip_dependencies:
+            pip_install(target.name, dep)
 
 
 def switch_environment(target):
