@@ -48,6 +48,10 @@ class UmapTests(GitTarget):
                 "matplotlib datashader holoviews tensorflow scikit-image"]
 
     @property
+    def pip_dependencies(self):
+        return []
+    
+    @property
     def install_command(self):
         return "pip install -e ."
 
