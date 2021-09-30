@@ -13,7 +13,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='texasbbq',
-    version='0.1.0',
+    version='0.2.0',
     description='Smoke out the bugs that break dependent projects.',
     long_description=long_description,
     long_description_content_type='text/x-rst',
