@@ -256,7 +256,7 @@ Continuous Integration Testing Examples
 * https://github.com/jrbourbeau/dask-integration-testing
 
 Caveats
-=======
+-------
 
 * The script is reasonably robust but won't respond well to malformed user
   input. For example, if you try to run only the ``test`` stage without the
@@ -265,6 +265,26 @@ Caveats
 * If you are running this locally and you already have an anaconda or miniconda
   distribution activated you may run into problems. In such cases it is best to
   run this script from a vanilla (non-customized) shell.
+
+
+Change Log
+----------
+
+0.2.0
+.....
+
+* First "real" release after two years of development and usage
+* Package has been running in production for quite some time and appears stable
+* Special thanks to `Kevin Cawly <https://github.com/KevinCawley>`_ for
+  providing `pip support <https://github.com/numba/texasbbq/pull/25>`_.
+* Thank you also to `James Bourbeau https://github.com/jrbourbeau>`_, `Stuart
+  Archibald <https://github.com/stuartarchibald>`_ and
+  `Stan Seibert <https://github.com/seibert>`_ for reviews and feedback
+
+0.1.0
+.....
+
+* Initial tag and typosquat PyPi
 
 License
 -------
