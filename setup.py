@@ -15,8 +15,6 @@ setup(
     name='texasbbq',
     version='0.2.0',
     description='Smoke out the bugs that break dependent projects.',
-    long_description=long_description,
-    long_description_content_type='text/x-rst',
     url='https://github.com/numba/texasbbq',
     author='Valentin Haenel',
     author_email='valentin@haenel.co',
