@@ -270,6 +270,11 @@ Caveats
 Change Log
 ----------
 
+0.2.1
+.....
+
+* Metadata update
+
 0.2.0
 .....
 
