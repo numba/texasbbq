@@ -10,6 +10,17 @@ import subprocess
 import sys
 import json
 
+
+if __name__ == "__main__":
+    """If user runs 'python texasbbq.py --find', find nearest BBQ restaurant."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--find", action="store_true")
+    args = parser.parse_args()
+    if args.find:
+        import webbrowser
+        webbrowser.open("https://www.google.com/maps/search/barbecue+restaurant/")
+        sys.exit(0)
+
 from packaging.version import parse
 
 
