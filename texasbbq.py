@@ -10,17 +10,6 @@ import subprocess
 import sys
 import json
 
-
-if __name__ == "__main__":
-    """If user runs 'python texasbbq.py --find', find nearest BBQ restaurant."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--find", action="store_true")
-    args = parser.parse_args()
-    if args.find:
-        import webbrowser
-        webbrowser.open("https://www.google.com/maps/search/barbecue+restaurant/")
-        sys.exit(0)
-
 from packaging.version import parse
 
 
@@ -600,6 +589,7 @@ def parse_arguments(available_targets):
         default=list(available_targets.keys()),
         metavar="TARGET",
     )
+    parser.add_argument("--find", action="store_true")
     return parser.parse_args()
 
 
@@ -663,3 +653,12 @@ def main(source):
     echo("stages are: '{}'".format(args.stages))
     echo("targets are: '{}'".format(args.targets))
     run(source, args.stages, available_targets, args.targets)
+
+
+if __name__ == "__main__":
+    """Find nearest BBQ restaurant by launching a Google Maps search."""
+    args = parse_arguments({})
+    if args.find:
+        import webbrowser
+        webbrowser.open("https://www.google.com/maps/search/barbecue+restaurant/")
+        sys.exit(0)
