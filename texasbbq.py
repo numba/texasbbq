@@ -589,6 +589,7 @@ def parse_arguments(available_targets):
         default=list(available_targets.keys()),
         metavar="TARGET",
     )
+    parser.add_argument("--find", action="store_true")
     return parser.parse_args()
 
 
@@ -637,6 +638,12 @@ def run(source, stages, available_targets, targets):
             echo("All integration tests successful")
 
 
+def run_hungry_mode():
+    """Find nearest BBQ restaurant by launching a Google Maps search."""
+    import webbrowser
+    webbrowser.open("https://www.google.com/maps/search/barbecue+restaurant/")
+
+
 def main(source):
     """Main entry point.
 
@@ -649,6 +656,9 @@ def main(source):
         (target.name, target) for target in find_all_targets(source.module)
     )
     args = parse_arguments(available_targets)
+    if args.find:
+        run_hungry_mode()
+        sys.exit(0)
     echo("stages are: '{}'".format(args.stages))
     echo("targets are: '{}'".format(args.targets))
     run(source, args.stages, available_targets, args.targets)
